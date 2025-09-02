@@ -1,9 +1,49 @@
+
+from .serializers import VendorSerializer
+
+from django.db.models import Count,Sum, Avg, F, ExpressionWrapper, FloatField, Case, When, IntegerField
+from django.db.models.functions import Cast
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from django.db.models import Count, Sum, Avg, F
 from .models import Vendor
-from sales.models import Order
-from .serializers import VendorSerializer
+from sales.models import Order   # assuming orders are in sales app
+
+@api_view(["GET"])
+def vendor_details(request):
+    vendors = Vendor.objects.all()
+
+    vendor_data = []
+
+    for v in vendors:
+        # Orders for this vendor
+        orders = Order.objects.filter(vendor=v)
+
+        total_orders = orders.count()
+
+        # On-time %
+        on_time_count = orders.filter(delay_minutes__lte=15).count()  # <=15 mins = on-time
+        on_time_percent = (on_time_count / total_orders * 100) if total_orders > 0 else 0
+
+        # Avg delay (in hours)
+        avg_delay = orders.aggregate(avg_delay=Avg("delay_minutes"))["avg_delay"] or 0
+        avg_delay_hours = round(avg_delay / 60, 2) if avg_delay else 0
+
+        # Products supplied (distinct product count)
+        products_supplied = orders.values("product").distinct().count()
+
+        vendor_data.append({
+            "id": v.id,
+            "vendor_name": v.name,
+            "products_supplied": products_supplied,
+            "on_time_percent": round(on_time_percent, 2),
+            "avg_delay": avg_delay_hours,
+            "total_orders": total_orders,
+            "status": "Active" if total_orders > 0 else "Inactive",
+        })
+
+    return Response(vendor_data)
+
+
 
 # 1. Summary
 @api_view(['GET'])
@@ -54,9 +94,3 @@ def vendor_supply_contribution(request):
     )
     return Response(contribution)
 
-# 4. Vendor Details (table)
-@api_view(['GET'])
-def vendor_details(request):
-    vendors = Vendor.objects.all()
-    serializer = VendorSerializer(vendors, many=True)
-    return Response(serializer.data)

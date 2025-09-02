@@ -1,10 +1,11 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from django.db.models import Sum, Count
+from django.db.models import Sum, Count,Max
 from django.db.models.functions import TruncMonth
 from .models import Order
 from .serializers import OrderSerializer
 from inventory.models import Product
+from django.utils.timezone import now
 
 # 1. Summary (Total Sales, Top Product, Growth %, Pending Orders)
 @api_view(['GET'])
@@ -58,9 +59,10 @@ def sales_trend(request):
 # 3. Sales by Product (bar chart - latest month)
 @api_view(['GET'])
 def sales_by_product(request):
-    latest_month = Order.objects.latest("order_date").order_date.month
+    today = now().date()
     sales = (
-        Order.objects.filter(order_date__month=latest_month)
+        Order.objects
+        .filter(order_date__year=today.year, order_date__month=today.month)  # 👈 too strict
         .values("product__name")
         .annotate(total_sales=Sum("order_value"))
         .order_by("-total_sales")

@@ -35,12 +35,13 @@ def sales_over_time(request):
 # Inventory levels (sum by category)
 @api_view(['GET'])
 def inventory_levels(request):
-    levels = (
+    data = (
         Inventory.objects
-        .values('category')
+        .values('product__category')  # <-- follow relation to Product
         .annotate(total_stock=Sum('stock_level'))
+        .order_by('product__category')
     )
-    return Response(levels)
+    return Response(data)       
 
 # Vendor contribution (sales by vendor)
 @api_view(['GET'])
