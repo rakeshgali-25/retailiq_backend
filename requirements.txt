@@ -2,10 +2,10 @@ asgiref==3.9.1
 Django==5.2.5
 django-cors-headers==4.7.0
 djangorestframework==3.16.1
-git-filter-repo==2.47.0
-gunicorn==23.0.0
-packaging==25.0
-psycopg2-binary==2.9.10
+djangorestframework_simplejwt==5.5.1
+psycopg2==2.9.10
+PyJWT==2.10.1
 python-dotenv==1.1.1
+rest-framework-simplejwt==0.0.2
 sqlparse==0.5.3
 tzdata==2025.2
