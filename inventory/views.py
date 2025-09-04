@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from django.db.models import Sum, Count
 from .models import Inventory
 from .serializers import InventorySerializer
+from .models import Product
 
 # 1. Summary cards
 @api_view(['GET'])
@@ -46,3 +47,8 @@ def stock_details(request):
     stocks = Inventory.objects.all()
     serializer = InventorySerializer(stocks, many=True)
     return Response(serializer.data)
+
+@api_view(['GET'])
+def product_list(request):
+    products = Product.objects.all().values("id", "name")
+    return Response(list(products))

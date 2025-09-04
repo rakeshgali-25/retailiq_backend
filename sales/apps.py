@@ -1,6 +1,10 @@
 from django.apps import AppConfig
 
-
 class SalesConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'sales'
+    label = 'sales' 
+
+    def ready(self):
+        # import signals so receivers get registered
+        from . import signals  # noqa
