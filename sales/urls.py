@@ -7,7 +7,6 @@ urlpatterns = [
     path("by-product/", views.sales_by_product, name="sales-by-product"),
     path("recent-orders/", views.recent_orders, name="recent-orders"),
 
-    # CRUD for Orders
-   path('orders/', views.order_list, name='order-list'),            # GET, POST
-    path('orders/<int:pk>/', views.order_detail, name='order-detail')# GET, PUT, DELETE
+    path("orders/", views.OrderListAPIView.as_view(), name="orders-list"),
+    path("orders/<int:pk>/", views.order_detail, name="order-detail"),
 ]

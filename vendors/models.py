@@ -7,6 +7,8 @@ class Vendor(models.Model):
     state = models.CharField(max_length=50, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     email = models.EmailField(null=True, blank=True)
+    on_time_percent = models.FloatField(default=0.0, help_text="Percent of on-time deliveries (0-100)")
+    avg_delay_hours = models.FloatField(default=0.0, help_text="Average delay in hours")
 
     def __str__(self):
         return f"{self.code} - {self.name}"
